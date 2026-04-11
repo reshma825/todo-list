@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Add Task Card -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body">
+                <h4 class="card-title fw-bold mb-3">Add New Task</h4>
+                <form action="{{ url_for('add_task') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Task Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="What needs to be done?" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="2" placeholder="Add further details..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                        <i class="fas fa-plus me-2"></i>Add Task
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Task List Filters -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold m-0">Tasks</h4>
+            <div class="btn-group" role="group" aria-label="Task Filters">
+                <a href="{{ url_for('index', filter='all') }}" class="btn btn-outline-secondary btn-sm {{ 'active' if current_filter == 'all' }}">All</a>
+                <a href="{{ url_for('index', filter='pending') }}" class="btn btn-outline-secondary btn-sm {{ 'active' if current_filter == 'pending' }}">Pending</a>
+                <a href="{{ url_for('index', filter='completed') }}" class="btn btn-outline-secondary btn-sm {{ 'active' if current_filter == 'completed' }}">Completed</a>
+            </div>
+        </div>
+
+        <!-- Tasks Display -->
+        {% if tasks %}
+            <div class="task-list">
+                {% for task in tasks %}
+                    <div class="card mb-3 shadow-sm border-0 task-card {{ 'completed' if task.is_completed }}">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1 {{ 'text-muted text-decoration-line-through' if task.is_completed }}">
+                                    {{ task.title }}
+                                </h5>
+                                {% if task.description %}
+                                    <p class="text-muted small mb-1">{{ task.description }}</p>
+                                {% endif %}
+                                <div class="d-flex align-items-center mt-2">
+                                    <span class="badge {{ 'bg-success' if task.is_completed else 'bg-warning text-dark' }} me-2">
+                                        {{ 'Completed' if task.is_completed else 'Pending' }}
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="far fa-clock me-1"></i>{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{{ url_for('complete_task', task_id=task.id) }}" class="btn btn-sm {{ 'btn-success' if not task.is_completed else 'btn-outline-secondary' }}" title="{{ 'Mark as Complete' if not task.is_completed else 'Mark as Pending' }}">
+                                    <i class="fas {{ 'fa-check' if not task.is_completed else 'fa-undo' }}"></i>
+                                </a>
+                                <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete Task">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center mt-5 py-5 bg-light rounded shadow-sm">
+                <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                <p class="text-muted lead">No tasks found. Start by adding one above!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
