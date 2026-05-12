@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, Task
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='template')
 
 # Basic Config
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-123')
